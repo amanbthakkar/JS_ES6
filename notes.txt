@@ -1,0 +1,274 @@
+https://www.youtube.com/watch?v=NCwa_xi0Uuc
+#######################################################################################
+
+var vs let
+
+function sayHello(){
+  for (var i =0; i<5;i++){
+    console.log(i);
+  }
+
+//i is accessible outside of the loop also - value 5 (in JS)
+//Hence we replace var by let
+}
+sayHello();
+
+#######################################################################################
+
+//another new thing is 'const' -> it is also block scoped like let
+
+const x = 1;
+x=2; ->ERROR!
+
+Hence use const over let unless you really need to reassign
+
+########################################################################################
+
+function inside an object is called method. So walk is a method inside person object.
+
+const person = {
+  name: "Aman",
+  talk () {},
+  walk: function() {} //2 ways of defining a method in an object
+};
+
+
+//and now 2 ways to call it 
+
+
+person.talk();
+person['name'] = "Rahul" //can be used to call methods or reassign variables 
+
+//Use square brackets when udk which property you are going to access ahead of time
+
+const target = 'name'; //could be input field in a form
+//depending on which we access the object's property.
+
+########################################################################################
+THIS:
+
+const person = {
+  name: "Aman",
+  walk () {
+    console.log(this); //returning a reference to the person object - but not always!
+  }
+}
+
+//person.walk();
+
+const walk = person.walk; //not calling, just setting reference
+//console.log(walk);
+walk(); //dont get reference to person object, instead we get 'undefined' OR window object
+//the above is based on javascript strict mode on (undefined) or not (window object)
+//hence if we call a function returning this from an object, this = object
+//otherwise if we call it as a standalone function, this = window
+
+########################################################################################
+
+HOW TO FIX THE ABOVE - THIS ALWAYS RETURNS REFERENCE TO THE PERSON object
+
+===> IN javascript FUNCTIONS ARE OBJECTS!!
+const walk = person.walk.bind(person); //see first parameter of bind function is actually 'this' setter
+//console.log(walk);
+walk();
+########################################################################################
+
+ARROW FUNCTIONS:
+
+const square = function(number){
+  return number*number;
+}
+
+const square1 = (number) => { //arrow function for above
+  return number * number;
+}
+
+const square2 = number => {   //no need for () when just one parameter
+  return number*number;
+}
+
+const no_param = () => {   //when no parameters
+  return x*y;
+}
+
+const one_line = number => number*number; //when one parameter and just one return line in the function
+----
+Where useful?
+
+Suppose we have a job array of objects and a filter method that takes a predicate method
+The predicate method's job is to filter and return the jobs that are true
+REMEMBER: The part after the equal-to sign is the function, left hand side in above examples is just assigning
+So when we want to use the 'function' we can just use RHS short:
+
+const jobs = [
+  {id: 1, isActive: true},
+  {id: 2, isActive: true},
+  {id: 3, isActive: false}
+];
+
+const active_jobs = jobs.filter(function(job) {return job.isActive;})
+//OR
+const active_jobs1=jobs.filter(job => job.isActive)
+
+console.log(active_jobs)
+
+//READ AS: FILTER JOBS WHERE: JOB IS ACTIVE (job => job.isActive)
+
+########################################################################################
+ARROW FUNCTIONS AND THIS:
+!!Arrow functions don't rebind 'this'
+ 
+ const person = {
+  talk() {
+    setTimeout(function(){
+      console.log("this", this); //if u wrap 'this' inside a setTimeout function it gives window object!
+    },1000);
+  }
+}
+
+person.talk();
+
+//Why? Because the callback function does not belong to any specific object
+
+
+SO WHAT TO DO? EITHER DECLARE variable outside the callback as var self = this; and then use 'self' in callback
+or use ARROW -> it inherits the this keyword
+
+const person = {
+  talk() {
+    setTimeout(()=>{
+      console.log("this", this); //if u wrap 'this' inside a setTimeout function it gives window object!
+    },1000);
+  }
+}
+
+person.talk();
+
+########################################################################################
+ARRAY.map()
+
+Used popularly in REACT, Used to render a list of items
+
+const colors = ["Red", "Green", "BLue"];
+
+//colors.map() //we pass a callback function who's job is to transform each function in the array
+const items =colors.map(function(color) {
+  return '<li>'+color+'</li>'; //i.e. take a color and return a list item
+})
+
+//can be transformed to an arrow function
+
+const items2 = colors.map(color => '<li>'+color+'</li>');
+
+//these concatenations are ugly -> use template literals
+
+const items3 = colors.map(color => `<li>${color}</li>`);
+//this is a template literal and value provided at runtime
+
+console.log(items3);
+
+########################################################################################
+
+OBJECT DESTRUCTURING:
+
+const address = {
+  street: 'A',
+  city: 'B',
+  country:'C'
+}
+
+//const {street, city, country} = address;
+//all not necessary
+const {street} = address; //works -> it matches the name of variable
+//BUT - what if we want to rename? We use an alias
+const {street: st} = address;
+console.log(st);
+
+########################################################################################
+
+SPREAD OPERATOR!!!
+
+const first = [1,2,3];
+const second = [4,5,6];
+
+const oldway = first.concat(second);
+const newway = [...first, ...second]; //... is spread operator
+//why is it cool?
+const third = [...first, 'a', ...second, 'x']; //can add items anywhere
+
+//can also clone arry
+const clone = [...first];
+
+//can also use spread on objects
+
+const one = {name: "Aman"};
+const two = {surname: "Thakkar"};
+
+const full = {...one, ...two, location: "Mumbai"};
+const clone_object = {...one};
+console.log(full);
+console.log(clone_object);
+
+########################################################################################
+
+CLASSES
+
+class Person {
+
+  constructor(name){
+    this.name = name;
+  }
+  walk() {
+    console.log("Walk");
+  }
+}
+const person = new Person("Aman");
+console.log(person.walk());
+
+########################################################################################
+
+INHERITANCE
+class Person {
+
+  constructor(name){
+    this.name = name;
+  }
+  walk() {
+    console.log("Walk");
+  }
+}
+const person = new Person("Aman");
+console.log(person.walk());
+
+class Teacher extends Person{
+
+  constructor(name, degree){
+    //because there is a custom constructor, we need to call superclass constructor
+    super(name);
+    this.degree = degree;
+  }
+  teach() {
+    console.log("Teach");
+  }
+}
+
+const t = new Teacher("Aman Thakkar", "BTech");
+t.teach();
+t.walk();
+
+//Hence in REACT we make our components extend some Base components because they have some necessary functions
+
+########################################################################################
+
+Modularazation: Split classes into different JS files, and export them and use them as required
+Then default and named exports - if you are exporting just one thing from js then if you name it as 
+a default export, then while importing in other file you can do 
+import abc from 'xyz' instead of (.... if abc is marked as export default))
+import { abc } from 'xyz'
+
+There can be one default and many named exports... React module is an example of that.
+
+Then do 
+import abc , { def } from 'xyz'
+analogous to 
+import React, { Component } from 'react'
